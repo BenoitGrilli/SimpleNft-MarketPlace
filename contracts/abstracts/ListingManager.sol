@@ -5,9 +5,9 @@ import './Controlable.sol';
 
 import '@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol';
 
-// IERC721ReceiverUpgradeable
+import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 
-abstract contract ListingManager is Controlable {
+abstract contract ListingManager is Controlable, IERC721Receiver {
   struct Listing {
     address tokenContract;
     uint tokenId;
@@ -29,6 +29,10 @@ abstract contract ListingManager is Controlable {
     __Controlable_init(treasury);
   }
 
+  function onERC721Received(address, address, uint256, bytes memory) public virtual override returns (bytes4) {
+    return this.onERC721Received.selector;
+  }
+
   function _calculateListingFee(uint256 listingId) internal view returns (uint256 amount) {
     uint256 fee = (_listings[listingId].salePrice * uint256(_transactionFee)) / BASE_TRANSACTION_FEE;
     return fee;
@@ -37,7 +41,7 @@ abstract contract ListingManager is Controlable {
   function _createListing(address tokenContract, uint256 tokenId, uint256 salePrice, address seller) internal returns (uint256 listingId) {
     require(!_isBlacklistedUser(seller), 'ListingManager: User is blacklisted');
     require(!_isBlacklistedToken(tokenContract, tokenId), 'ListingManager: Contract token is blacklisted');
-    require(!_isSupportedContract(tokenContract), 'ListingManager: Contract token is not supported');
+    require(_isSupportedContract(tokenContract), 'ListingManager: Contract token is not supported');
     require(salePrice > 0, 'ListingManager: Sell price must be above zero');
 
     IERC721Upgradeable(tokenContract).safeTransferFrom(seller, address(this), tokenId);
