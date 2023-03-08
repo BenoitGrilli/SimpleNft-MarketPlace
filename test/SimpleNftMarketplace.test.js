@@ -60,11 +60,7 @@ describe("SimpleNftMarketplace", function () {
       const signature = await Helper.signatures.signCreateListing(contract.address, owner, mockERC20.address, 1, 100, owner.address);
       // await contract.createListing(mockERC20.address, 1, 100, owner.address, signature.v, signature.r, signature.s);
 
-<<<<<<< HEAD
-      // await contract['createListing(address,uint256,uint256)']();
-=======
       //  await contract['createListing(address,uint256,uint256)']();
->>>>>>> Benwa
       // await contract['createListing(address,uint256,uint256,address,uint8,bytes32,bytes32)'](mockERC20.address, 1, 100, owner.address, signature.v, signature.r, signature.s);
       // console.log('signature', signature);
     });
