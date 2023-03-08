@@ -1,5 +1,4 @@
 const { network } = require('hardhat');
-
 const constants = require('../../constants');
 
 console.log('\x1b[34m', `${constants.FIGLET_NAME}\n`, '\x1b[32m', 'Connected to network: ', '\x1b[33m', network.name, '\x1b[0m');
