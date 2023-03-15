@@ -193,7 +193,7 @@ describe('Test-Benoit', function () {
   });
 
   it('does moderator helper works (should be)', async function () {
-    await Helper.moderator(user2.address);
+    await Helper.promoteModerator(user2.address);
     expect(await contract.isModerator(user2.address)).to.be.equal(true);
   });
 
@@ -202,7 +202,7 @@ describe('Test-Benoit', function () {
     await Helper.changeSupportedContractIsSupported(mockERC721.address);
     await Helper.create_listing(user1, mockERC721.address, 1, 50, 0);
 
-    await Helper.moderator(user2.address);
+    await Helper.promoteModerator(user2.address);
     expect(await contract.connect(user2).callStatic.cancelListing(0)).to.be.equal(true);
   });
 

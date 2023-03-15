@@ -100,7 +100,7 @@ const changeSupportedContractIsSupported = async (contractAddress) => {
   expect(await contract.isSupportedContract(contractAddress)).to.be.equal(true);
 };
 
-const moderator = async (userAddress) => {
+const promoteModerator = async (userAddress) => {
   expect(await contract.isModerator(userAddress)).to.be.equal(false);
   await contract.grantRole(await contract.MODERATOR_ROLE(), userAddress);
   expect(await contract.isModerator(userAddress)).to.be.equal(true);
@@ -121,5 +121,5 @@ module.exports = {
   deploy_Mint_ApproveERC20,
   create_listing,
   changeSupportedContractIsSupported,
-  moderator
+  promoteModerator
 };
