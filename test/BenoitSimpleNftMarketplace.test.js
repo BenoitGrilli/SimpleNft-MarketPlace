@@ -68,7 +68,6 @@ describe('Test-Benoit', function () {
     const token = await Helper.deploy_Mint_ApproveERC20(user2, contract.address, 60);
     await contract.changeToken(token.address);
     expect(await contract.connect(user2).callStatic['buyListing(uint256)'](0)).to.be.equal(true);
-    await contract.connect(user2)['buyListing(uint256)'](0);
   });
 
   it('Does user 2 can buy NFT to user 1 if his balance is insufficient (should not)', async function () {
@@ -206,24 +205,38 @@ describe('Test-Benoit', function () {
     expect(await contract.connect(user2).callStatic.cancelListing(0)).to.be.equal(true);
   });
 
-  // it.only('Does moderator can cancelListing (should be)', async function () {
-  //   const mockERC721 = await Helper.deploy_Mint_ApproveERC721(user1, 1);
-  //   await Helper.changeSupportedContractIsSupported(mockERC721.address);
-  //   await Helper.create_listing(user1, mockERC721.address, 1, 50, 0);
+  it('Is it  possible to change the transaction fees as the admin ? (Should be)', async function () {
+    const fees = await contract.transactionFee();
+    await expect(fees).to.be.equal(0);
 
-  //   await Helper.moderator(user2.address);
-  //   console.log(user2.address);
+    await contract.changeTransactionFee(10);
 
-  //   await expect(contract.connect(user2).cancelListing(0)).to.be.equal(true);
-  // });
+    const newFees = await contract.transactionFee();
+    await expect(newFees).to.be.equal(10);
+  });
+
+  it('Is it  possible to change the transaction fees as the moderator / user ? (Should not)', async function () {
+    const fees = await contract.transactionFee();
+    await expect(fees).to.be.equal(0);
+
+    await Helper.promoteModerator(user1.address);
+    await expect(contract.connect(user1.address).callStatic.changeTransactionFee(10)).to.be.reverted;
+    await expect(contract.connect(user2.address).callStatic.changeTransactionFee(10)).to.be.reverted;
+  });
+
+  it('Does user can buy nft twice (should not)', async function () {
+    const mockERC721 = await Helper.deploy_Mint_ApproveERC721(user1, 1);
+    await Helper.changeSupportedContractIsSupported(mockERC721.address);
+    await Helper.create_listing(user1, mockERC721.address, 1, 200, 0);
+
+    const token = await Helper.deploy_Mint_ApproveERC20(user2, contract.address, 500);
+    await contract.changeToken(token.address);
+    await contract.connect(user2)['buyListing(uint256)'](0);
+    expect(await contract.isSold(0)).to.be.equal(true);
+    await expect(contract.connect(user2.address).callStatic['buyListing(uint256)'](0)).to.be.reverted;
+  });
+
+  it('Is admin able to withdrawTransactionFee (should be)', async function () {
+    // await contract.callStatic.withdrawTransactionFee();
+  });
 });
-
-// await contract.grantRole(await contract.MODERATOR_ROLE(), user2.address);
-// expect(await contract.isModerator(user2.address)).to.be.equal(true);
-// await contract.connect(user2).cancelListing(0);
-// expect(await contract.isListingActive(0)).to.be.equal(false);
-
-// await contract.grantRole(await contract.MODERATOR_ROLE(), user3.address);
-// expect(await contract.isModerator(user3.address)).to.be.equal(true);
-// await expect(contract.connect(user2).cancelListing(0)).to.be.reverted;
-//
