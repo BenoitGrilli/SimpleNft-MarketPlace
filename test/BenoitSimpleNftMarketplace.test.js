@@ -237,6 +237,6 @@ describe('Test-Benoit', function () {
   });
 
   it('Is admin able to withdrawTransactionFee (should be)', async function () {
-    // await contract.callStatic.withdrawTransactionFee();
+    // aawait contract.callStatic.withdrawTransactionFee();
   });
 });
