@@ -235,8 +235,45 @@ describe('Test-Benoit', function () {
     expect(await contract.isSold(0)).to.be.equal(true);
     await expect(contract.connect(user2.address).callStatic['buyListing(uint256)'](0)).to.be.reverted;
   });
-
-  it('Is admin able to withdrawTransactionFee (should be)', async function () {
-    // await contract.callStatic.withdrawTransactionFee();
+    // await contract.withdrawTransactionFee();
   });
+
+  // it.only('Is admin able to withdrawTransactionFee (should be)', async function () {
+  //   await contract.changeTransactionFee(50);
+  //   const feesBefore = await contract.accumulatedFees();
+  //   console.log(feesBefore);
+
+  //   const mockERC721 = await Helper.deploy_Mint_ApproveERC721(user1, 1);
+  //   await Helper.changeSupportedContractIsSupported(mockERC721.address);
+  //   await Helper.create_listing(user1, mockERC721.address, 1, 100, 0);
+
+  //   const mockERC721v2 = await Helper.deploy_Mint_ApproveERC721(user3, 1);
+  //   await Helper.changeSupportedContractIsSupported(mockERC721v2.address);
+  //   await Helper.create_listing(user3, mockERC721v2.address, 1, 100, 0);
+
+  //   const token = await Helper.deploy_Mint_ApproveERC20(user2, contract.address, 1000);
+  //   await contract.changeToken(token.address);
+
+  //   await contract.connect(user2)['buyListing(uint256)'](0);
+  //   await contract.connect(user2)['buyListing(uint256)'](1);
+  //   console.log(await contract.isSold(0));
+  //   console.log(await contract.isSold(1));
+  //   console.log(await contract.calculateListingFee(0));
+  //   console.log(await contract.accumulatedFees());
+
+  //   const feesAfter = await contract.accumulatedFees();
+  //   console.log(feesAfter);
+  // });
+
+  // it.only('Is admin able to withdrawTransactionFee (should be)', async function () {
+
+  //   const feesBefore = await contract.accumulatedFees();
+  //   console.log(feesBefore);
+
+  //   await contract.increaseAccumulatedTransactionFee(1000);
+
+  //   const feesAfter = await contract.accumulatedFees();
+  //   console.log(feesAfter);
+
+  // });
 });
