@@ -89,6 +89,12 @@ const deploy_Mint_ApproveERC20 = async (sender, spenderAddress, _amount) => {
   return mockERC20;
 };
 
+const changeSupportedContract = async (contract, sender, nftAddress, value, error) => {
+  await contract.connect(sender).changeSupportedContract(nftAddress, value);
+  // await checkRawTxnResult(input, sender, error);
+  if (!error) expect(await contract.isSupportedContract(nftAddress)).to.be.equal(value);
+};
+
 const create_listing = async (sender, contractAddress, tokenId, price, listingId) => {
   await contract.connect(sender)['createListing(address,uint256,uint256)'](contractAddress, tokenId, price);
   expect(await contract.listingPrice(listingId)).to.be.equal(price);
@@ -119,6 +125,9 @@ module.exports = {
   mintERC20,
   approveERC20,
   deploy_Mint_ApproveERC20,
+
+  changeSupportedContract,
+
   create_listing,
   changeSupportedContractIsSupported,
   promoteModerator

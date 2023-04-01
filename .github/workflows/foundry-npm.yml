@@ -1,6 +1,8 @@
 name: Run Foundry Test with NPM
 
-on: [push]
+on:
+  pull_request:
+  workflow_dispatch:
 
 jobs:
   test_foundry_npm:

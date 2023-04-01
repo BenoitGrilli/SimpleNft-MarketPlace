@@ -73,8 +73,7 @@ contract Enzo_test_SimpleNftMarketplace is Helper {
     assertEq(marketplace.listingPrice(0), 100);
     assertTrue(marketplace.isListingActive(0), 'Listing is not active');
     // Cancel without permission
-    Errors.verify_revertCall(RevertStatus.CallerNotListingOwnerOrModerator);
-    helper_cancelListing(address(2), 0);
+    helper_cancelListing(address(2), 0, RevertStatus.CallerNotListingOwnerOrModerator);
     assertEq(marketplace.listingPrice(0), 100);
     assertTrue(marketplace.isListingActive(0), 'Listing is not active');
     // test with ModoAccess
@@ -164,31 +163,47 @@ contract Enzo_test_SimpleNftMarketplace is Helper {
     assertEq(marketplace.listingPrice(0), 50);
   }
 
-  // function test_SimpleNftMarketplace_transactionFee() public {
-  //   helper_changeToken(ADMIN, IERC20Upgradeable(address(token)));
-  //   helper_changeSupportedContract(ADMIN, address(nft1), true);
-  //   helper_changeSupportedContract(ADMIN, address(nft2), true);
+  function test_SimpleNftMarketplace_basic_cancelListing_by_moderator() public {
+    helper_changeToken(ADMIN, IERC20Upgradeable(address(token)));
+    helper_changeSupportedContract(ADMIN, address(nft1), true);
+    // Mint token, approve marketplace
+    helper_mint_approve721(address(nft1), address(1), 1);
+    // Create listing
+    helper_createListing(address(1), address(nft1), 1, 100);
+    // Verify
+    assertEq(marketplace.listingPrice(0), 100);
+    assertTrue(marketplace.isListingActive(0), 'Listing is not active');
+    // Cancel
+    helper_cancelListing(ADMIN, 0);
+  }
 
-  //   helper_mint_approve721(address(nft1), address(1), 1);
-  //   helper_mint_approve721(address(nft2), address(1), 1);
+  function test_SimpleNftMarketplace_transactionFee() public {
+    helper_changeToken(ADMIN, IERC20Upgradeable(address(token)));
+    helper_changeSupportedContract(ADMIN, address(nft1), true);
+    helper_changeSupportedContract(ADMIN, address(nft2), true);
 
-  //   assertEq(marketplace.transactionFee(), 0);
-  // Errors.verify_revertCall(RevertStatus.CallerNotAdmin);
-  // assertTrue(marketplace.changeTransactionFee(marketplace.BASE_TRANSACTION_FEE()));
+    helper_mint_approve721(address(nft1), address(1), 1);
+    helper_mint_approve721(address(nft2), address(1), 1);
 
-  // vm.prank(ADMIN);
-  // assertTrue(marketplace.changeTransactionFee(marketplace.BASE_TRANSACTION_FEE()));
-  // assertEq(marketplace.transactionFee(), 100_000);
+    assertEq(marketplace.transactionFee(), 0);
 
-  // helper_createListing(address(1), address(nft1), 1, 100);
-  // assertEq(marketplace.calculateListingFee(0), 1);
+    uint32 fee = marketplace.BASE_TRANSACTION_FEE();
+    Errors.verify_revertCall(RevertStatus.CallerNotAdmin);
+    assertTrue(!marketplace.changeTransactionFee(fee));
 
-  // help_moveBlockAndTimeFoward(1, 100);
+    // vm.prank(ADMIN);
+    // assertTrue(marketplace.changeTransactionFee(marketplace.BASE_TRANSACTION_FEE()));
+    // assertEq(marketplace.transactionFee(), 100_000);
 
-  // helper_mint_approve20(address(2), 200);
+    // helper_createListing(address(1), address(nft1), 1, 100);
+    // assertEq(marketplace.calculateListingFee(0), 1);
 
-  // helper_buyListing(address(2), 0);
+    // help_moveBlockAndTimeFoward(1, 100);
 
-  // assertEq(marketplace.accumulatedFees(), 1);
-  // }
+    // helper_mint_approve20(address(2), 200);
+
+    // helper_buyListing(address(2), 0);
+
+    // assertEq(marketplace.accumulatedFees(), 1);
+  }
 }

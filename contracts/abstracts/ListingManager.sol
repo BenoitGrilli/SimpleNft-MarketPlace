@@ -2,7 +2,7 @@
 pragma solidity ^0.8.19;
 
 import './Controlable.sol';
-
+import 'hardhat/console.sol';
 import '@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol';
 
 import '@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol';
@@ -57,7 +57,10 @@ abstract contract ListingManager is Controlable, IERC721ReceiverUpgradeable {
   function _buyListing(uint256 listingId, address buyer) internal returns (bool success) {
     Listing memory listing = _listings[listingId];
     require(listing.buyTimestamp == 0, 'ListingManager: Listing already sold');
-    require(_listings[listingId].salePrice > 0, 'ListingManager: Sell price must be above zero');
+    require(listing.salePrice > 0, 'ListingManager: Sell price must be above zero or listing does not exist');
+    require(!_isBlacklistedUser(listing.seller), 'ListingManager: Seller is blacklisted');
+    require(!_isBlacklistedUser(buyer), 'ListingManager: Buyer is blacklisted');
+    require(_isSupportedContract(listing.tokenContract), 'ListingManager: Contract token is not supported');
 
     uint256 listingFee = _calculateListingFee(listingId);
     uint256 amount = listing.salePrice - listingFee;
@@ -81,13 +84,11 @@ abstract contract ListingManager is Controlable, IERC721ReceiverUpgradeable {
   }
 
   function _cancelListing(uint256 listingId) internal returns (bool) {
-    address tokenContract = _listings[listingId].tokenContract;
-    address seller = _listings[listingId].seller;
-    uint256 tokenId = _listings[listingId].tokenId;
+    Listing memory listing = _listings[listingId];
 
     _listings[listingId].salePrice = 0;
 
-    IERC721Upgradeable(tokenContract).safeTransferFrom(address(this), seller, tokenId);
+    IERC721Upgradeable(listing.tokenContract).safeTransferFrom(address(this), listing.seller, listing.tokenId);
     return true;
   }
 
